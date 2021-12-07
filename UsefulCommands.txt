@@ -1,0 +1,7 @@
+docker-compose run django django-admin startproject openchiaapi .
+docker-compose down
+docker-compose up
+docker exec -it django bash
+python manage.py migrate
+python manage.py createsuperuser --email ronld.goedeke@outlook.com --username admin
+python manage.py startapp api

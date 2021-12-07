@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  django:
+    build: .
+    container_name: django
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./openchiaapi:/usr/src/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - pgdb
+      # - chia
+  # chia:
+  #   image: ghcr.io/chia-network/chia:latest
+  #   container_name: chia
+  #   restart: always
+  #   environment:
+  #     - farmer=true
+  #     - upnp=false
+  #   ports:
+  #     - "8445:8444"
+  #   volumes:
+  #     - chia-data:/root/.chia/
+  pgdb:
+    image: postgres:14
+    container_name: pgdb
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+volumes:
+  chia-data:
+  db-data:
