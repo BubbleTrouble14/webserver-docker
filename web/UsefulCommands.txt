@@ -5,3 +5,6 @@ docker exec -it django bash
 python manage.py migrate
 python manage.py createsuperuser --email ronld.goedeke@outlook.com --username admin
 python manage.py startapp api
+docker exec -it pgdb psql -U postgres 
+\c postgres
+\d
