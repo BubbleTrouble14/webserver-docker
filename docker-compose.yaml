@@ -12,6 +12,17 @@ services:
     depends_on:
       - pgdb
       - chia
+  pgdb:
+    build: ./pgdb
+    container_name: chia_pgdb
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=chiadb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
   chia:
     build: ./chia
     container_name: chia
@@ -20,17 +31,6 @@ services:
       - "8445:8444"
     volumes:
       - chia-data:/root/.chia/
-  pgdb:
-    image: postgres:14
-    container_name: chia_pgdb
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_DB=chiadb
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=12345678
-    volumes:
-      - db-data:/var/lib/postgresql/data
 volumes:
   chia-data:
   db-data:

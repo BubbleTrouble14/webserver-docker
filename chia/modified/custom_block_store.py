@@ -28,100 +28,6 @@ class BlockStore:
         self = cls()
         
         self.pgdb = db_wrapper.pgdb
-        cursor_1 = self.pgdb.cursor()
-
-        create_table_full_blocks_query = '''CREATE TABLE IF NOT EXISTS full_blocks
-            (header_hash char(64) PRIMARY KEY,
-                weight bigint,
-                height integer,
-                total_iters bigint,
-                signage_point_index smallint,
-                pos_ss_cc_challenge_hash char(64),
-                proof_of_space_challenge char(64),
-                proof_of_space_pool_public_key char(96),
-                proof_of_space_pool_contract_puzzle_hash char(64),
-                proof_of_space_plot_public_key char(96),
-                proof_of_space_size smallint,
-                proof_of_space_proof bytea,
-                challenge_chain_sp_vdf_challenge char(64),
-                challenge_chain_sp_vdf_number_of_iterations bigint,
-                challenge_chain_sp_vdf_output_data char(200),
-                challenge_chain_sp_signature char(192),
-                challenge_chain_ip_vdf_challenge char(64),
-                challenge_chain_ip_vdf_number_of_iterations bigint,
-                challenge_chain_ip_vdf_output_data char(200),
-                reward_chain_sp_vdf_challenge char(64),
-                reward_chain_sp_vdf_number_of_iterations bigint,
-                reward_chain_sp_vdf_output_data char(200),
-                reward_chain_sp_signature char(192),
-                reward_chain_ip_vdf_challenge char(64),
-                reward_chain_ip_vdf_number_of_iterations bigint,
-                reward_chain_ip_vdf_output_data char(200),
-                infused_challenge_chain_ip_vdf_challenge char(64),
-                infused_challenge_chain_ip_vdf_number_of_iterations bigint,
-                infused_challenge_chain_ip_vdf_output_data char(200),
-                is_tx_block boolean,
-                challenge_chain_sp_proof_witness_type smallint,
-                challenge_chain_sp_proof_witness bytea,
-                challenge_chain_sp_proof_normalized_to_identity boolean,
-                challenge_chain_ip_proof_witness_type smallint,
-                challenge_chain_ip_proof_witness bytea,
-                challenge_chain_ip_proof_normalized_to_identity boolean,
-                reward_chain_sp_proof_witness_type smallint,
-                reward_chain_sp_proof_witness bytea,
-                reward_chain_sp_proof_normalized_to_identity boolean,
-                reward_chain_ip_proof_witness_type smallint,
-                reward_chain_ip_proof_witness bytea,
-                reward_chain_ip_proof_normalized_to_identity boolean,         
-                infused_challenge_chain_ip_proof_witness_type smallint,
-                infused_challenge_chain_ip_proof_witness bytea,
-                infused_challenge_chain_ip_proof_normalized_to_identity boolean,                    
-                prev_header_hash char(64),
-                reward_block_hash char(64),
-                foliage_block_data_unfinished_reward_block_hash char(64),
-                foliage_block_data_pool_target_puzzle_hash char(64),
-                foliage_block_data_pool_target_address char(62),
-                foliage_block_data_pool_target_max_height smallint,
-                foliage_block_data_pool_signature char(192),
-                foliage_block_data_farmer_reward_puzzle_hash char(64),
-                foliage_block_data_farmer_reward_address char(62),
-                foliage_block_data_extension_data char(64),
-                foliage_block_data_signature char(192),
-                foliage_transaction_block_hash char(64),
-                foliage_transaction_block_signature char(192),          
-                foliage_transaction_block_prev_transaction_block_hash char(64),
-                foliage_transaction_block_timestamp bigint,
-                foliage_transaction_block_filter_hash char(64),
-                foliage_transaction_block_additions_root char(64),
-                foliage_transaction_block_removals_root char(64),
-                foliage_transaction_block_transactions_info_hash char(64),    
-                transactions_info_generator_root char(64),
-                transactions_info_generator_refs_root char(64),
-                transactions_info_aggregated_signature char(192),
-                transactions_info_fees bigint,
-                transactions_info_cost bigint); '''
-        # finished_sub_slots: List[EndOfSubSlotBundle]  # If first sb
-        # transactions_info_reward_claims_incorporated List[Coin]  # These can be in any order
-        # transactions_generator Optional[SerializedProgram]  # Program that generates transactions
-        # transactions_generator_ref_list List[uint32]  # List of block heights of previous generators referenced in this block
-        
-        cursor_1.execute(create_table_full_blocks_query)
-        self.pgdb.commit()
-        cursor_1.close()
-
-        cursor_2 = self.pgdb.cursor()
-        create_table_reward_claims_incorporated_query = '''CREATE TABLE IF NOT EXISTS full_blocks_transactions_info_reward_claims_incorporated
-            (header_hash char(64),
-                parent_coin_info char(64),
-                puzzle_hash char(64),
-                address char(62),
-                amount numeric(21, 0),
-                PRIMARY KEY(header_hash, parent_coin_info)); '''
-
-        cursor_2.execute(create_table_reward_claims_incorporated_query)
-        self.pgdb.commit()
-        cursor_2.close()
-
         # All full blocks which have been added to the blockchain. Header_hash -> block
         self.db_wrapper = db_wrapper
         self.db = db_wrapper.db
@@ -169,8 +75,15 @@ class BlockStore:
     async def add_full_block(self, header_hash: bytes32, block: FullBlock, block_record: BlockRecord) -> None:
         self.block_cache.put(header_hash, block)
 
+        # pgdb_testcursor = self.pgdb.cursor()
+
+        # pgdb_testcursor.execute("CALL public.logmessage(%s)", ("test",))
+        # self.pgdb.commit()
+        # pgdb_testcursor.close()
+
         pgdb_cursor = self.pgdb.cursor()
-        pgdb_cursor.execute("INSERT INTO full_blocks (header_hash, weight, height, total_iters, signage_point_index, pos_ss_cc_challenge_hash, proof_of_space_challenge, proof_of_space_pool_public_key, proof_of_space_pool_contract_puzzle_hash, proof_of_space_plot_public_key, proof_of_space_size, proof_of_space_proof, challenge_chain_sp_vdf_challenge, challenge_chain_sp_vdf_number_of_iterations, challenge_chain_sp_vdf_output_data, challenge_chain_sp_signature, challenge_chain_ip_vdf_challenge, challenge_chain_ip_vdf_number_of_iterations, challenge_chain_ip_vdf_output_data, reward_chain_sp_vdf_challenge, reward_chain_sp_vdf_number_of_iterations, reward_chain_sp_vdf_output_data, reward_chain_sp_signature, reward_chain_ip_vdf_challenge, reward_chain_ip_vdf_number_of_iterations, reward_chain_ip_vdf_output_data, infused_challenge_chain_ip_vdf_challenge, infused_challenge_chain_ip_vdf_number_of_iterations, infused_challenge_chain_ip_vdf_output_data, is_tx_block, challenge_chain_sp_proof_witness_type, challenge_chain_sp_proof_witness, challenge_chain_sp_proof_normalized_to_identity, challenge_chain_ip_proof_witness_type, challenge_chain_ip_proof_witness, challenge_chain_ip_proof_normalized_to_identity, reward_chain_sp_proof_witness_type, reward_chain_sp_proof_witness, reward_chain_sp_proof_normalized_to_identity, reward_chain_ip_proof_witness_type, reward_chain_ip_proof_witness, reward_chain_ip_proof_normalized_to_identity, infused_challenge_chain_ip_proof_witness_type, infused_challenge_chain_ip_proof_witness, infused_challenge_chain_ip_proof_normalized_to_identity, prev_header_hash, reward_block_hash, foliage_block_data_unfinished_reward_block_hash, foliage_block_data_pool_target_puzzle_hash, foliage_block_data_pool_target_address, foliage_block_data_pool_target_max_height, foliage_block_data_pool_signature, foliage_block_data_farmer_reward_puzzle_hash, foliage_block_data_farmer_reward_address, foliage_block_data_extension_data, foliage_block_data_signature, foliage_transaction_block_hash, foliage_transaction_block_signature, foliage_transaction_block_prev_transaction_block_hash, foliage_transaction_block_timestamp, foliage_transaction_block_filter_hash, foliage_transaction_block_additions_root, foliage_transaction_block_removals_root, foliage_transaction_block_transactions_info_hash, transactions_info_generator_root, transactions_info_generator_refs_root, transactions_info_aggregated_signature, transactions_info_fees, transactions_info_cost) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
+        
+        pgdb_cursor.execute("CALL public.save_full_block(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
         (
             header_hash.hex(),
             block.reward_chain_block.weight,
@@ -242,6 +155,7 @@ class BlockStore:
             block.transactions_info_fees(),
             block.transactions_info_cost(),
         ))
+
         self.pgdb.commit()
         pgdb_cursor.close()
 
@@ -261,7 +175,7 @@ class BlockStore:
 
             pgdb_cursor_1 = self.pgdb.cursor()
             pgdb_cursor_1.executemany(
-                "INSERT INTO full_blocks_transactions_info_reward_claims_incorporated (header_hash, parent_coin_info, puzzle_hash, address, amount) VALUES(%s, %s, %s, %s, %s)", 
+                "INSERT INTO full_blocks_transactions_info_reward_claims_incorporated (header_hash, parent_coin_info, puzzle_hash, address, amount) VALUES(%s, %s, %s, %s, %s) ON CONFLICT (header_hash, parent_coin_info) DO UPDATE SET puzzle_hash = EXCLUDED.puzzle_hash, address = EXCLUDED.address, amount = EXCLUDED.amount;", 
                 values,
             )
             self.pgdb.commit()

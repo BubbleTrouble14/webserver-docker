@@ -31,23 +31,6 @@ class CoinStore:
         self = cls()
 
         self.pgdb = db_wrapper.pgdb
-        pgdb_cursor = self.pgdb.cursor()
-
-        create_table_query = '''CREATE TABLE IF NOT EXISTS coin_record
-            (coin_name char(64) PRIMARY KEY,
-                confirmed_index bigint,
-                spent_index bigint,
-                spent integer,
-                coinbase integer,
-                puzzle_hash char(64),
-                address char(62),
-                coin_parent char(64),
-                amount numeric(21, 0),
-                timestamp bigint); '''
-
-        pgdb_cursor.execute(create_table_query)
-        self.pgdb.commit()
-        pgdb_cursor.close()
 
         self.cache_size = cache_size
         self.db_wrapper = db_wrapper

@@ -153,8 +153,8 @@ class FullNode:
         self.respond_transaction_semaphore = asyncio.Semaphore(200)
         # create the store (db) and full node instance
 
-        self.pgdb_connection = psycopg2.connect(user="admin",
-                                password="12345678",
+        self.pgdb_connection = psycopg2.connect(user="postgres",
+                                password="postgres",
                                 host="chia_pgdb",
                                 port="5432",
                                 database="chiadb")
