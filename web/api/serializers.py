@@ -1,14 +1,13 @@
-from django.contrib.auth.models import User, Group
 from rest_framework import serializers
+from .models import Coin, Block
 
-
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class BlockSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = User
-        fields = ['url', 'username', 'email', 'groups']
+        model = Block
+        fields = '__all__'
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class CoinSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Group
-        fields = ['url', 'name']
+        model = Coin
+        fields = '__all__'

@@ -115,32 +115,6 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS public.coin_record
     OWNER to postgres;
 
-
-CREATE TABLE IF NOT EXISTS public.logmessages
-(
-    msg text
-);
-
-ALTER TABLE IF EXISTS public.logmessages OWNER to postgres;
-
-CREATE OR REPLACE PROCEDURE public.logmessage(IN msg1 text)
-
-LANGUAGE 'plpgsql'
-AS $BODY$
-
-begin
-INSERT INTO public.logmessages (
-    msg
-	)
-VALUES(
-    msg1
-	);
-
-end;
-$BODY$;
-
-GRANT EXECUTE ON ROUTINE public.logmessage(text) TO postgres;
-
 -- call public.logmessage('ape');
 -- select * from public.logmessages
 

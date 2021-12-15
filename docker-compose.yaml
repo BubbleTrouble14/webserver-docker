@@ -6,12 +6,13 @@ services:
     container_name: django
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./openchiaapi:/usr/src/app
+      - ./web:/usr/src/app
     ports:
       - "8000:8000"
     depends_on:
       - pgdb
-      - chia
+      # - chia
+      - cron
   pgdb:
     build: ./pgdb
     container_name: chia_pgdb
@@ -23,14 +24,19 @@ services:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - db-data:/var/lib/postgresql/data
-  chia:
-    build: ./chia
-    container_name: chia
-    restart: always
-    ports:
-      - "8445:8444"
-    volumes:
-      - chia-data:/root/.chia/
+  # chia:
+  #   build: ./chia
+  #   container_name: chia
+  #   restart: always
+  #   ports:
+  #     - "8445:8444"
+  #   volumes:
+  #     - chia-data:/root/.chia/
+  cron:
+    build: ./cron
+    container_name: cron
+    # entrypoint: /bin/bash
+    # command: ["cron", "-f"]
 volumes:
   chia-data:
   db-data:

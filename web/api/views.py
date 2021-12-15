@@ -1,22 +1,17 @@
 from django.contrib.auth.models import User, Group
+
+from .models import Coin, Block
 from rest_framework import viewsets
-from rest_framework import permissions
-from api.serializers import UserSerializer, GroupSerializer
+from api.serializers import (
+    CoinSerializer, 
+    BlockSerializer
+)
 
+class CoinViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Coin.objects.all()
+    serializer_class = CoinSerializer
 
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+class BlockViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Block.objects.all()
+    serializer_class = BlockSerializer
 
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAuthenticated]
