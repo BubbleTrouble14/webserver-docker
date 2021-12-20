@@ -1,4 +1,4 @@
-﻿create table public.exchange_rate(x_date date not null, currency char(3) not null, rate numeric(18, 5), primary key(x_date, currency));
+﻿CREATE TABLE IF NOT EXISTS public.exchange_rate(x_date date not null, currency char(3) not null, rate numeric(18, 5), primary key(x_date, currency));
 
 Insert into public.exchange_rate(x_date, currency, rate) values('2021-03-01','AUD',1.29179);
 Insert into public.exchange_rate(x_date, currency, rate) values('2021-03-01','BGN',1.62267);
@@ -9248,3 +9248,40 @@ Insert into public.exchange_rate(x_date, currency, rate) values('2021-12-14','SG
 Insert into public.exchange_rate(x_date, currency, rate) values('2021-12-14','THB',33.34990);
 Insert into public.exchange_rate(x_date, currency, rate) values('2021-12-14','TRY',8.36790);
 Insert into public.exchange_rate(x_date, currency, rate) values('2021-12-14','ZAR',15.93310);
+
+
+CREATE OR REPLACE PROCEDURE public.save_exchange_rate(
+	IN xDate date,
+	IN xCurrency char(3),
+    IN rate numeric(18, 5)
+    )
+LANGUAGE 'plpgsql'
+AS $BODY$
+
+
+begin
+
+CREATE TEMP TABLE bothDatesX (
+   dDate date
+) ON COMMIT DROP;
+
+insert into bothDatesX(dDate) values(xDate);
+insert into bothDatesX(dDate) values(xDate + 1);
+
+INSERT INTO public.exchange_rate (
+    x_date,
+    currency,
+    rate
+    )
+Select 
+    dDate,
+    xCurrency,
+    rate
+From
+	bothDatesX
+ON CONFLICT (x_date, currency) 
+DO UPDATE SET 
+    rate = EXCLUDED.rate;
+
+end;
+$BODY$;

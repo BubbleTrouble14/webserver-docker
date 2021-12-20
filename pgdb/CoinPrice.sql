@@ -1,4 +1,4 @@
-create table public.coin_price(p_date date not null, price numeric(21, 10) not null, primary key(p_date));
+CREATE TABLE IF NOT EXISTS public.coin_price(p_date date not null, price numeric(21, 10) not null, primary key(p_date));
 
 Insert into public.coin_price(p_date, price) values('2021-05-04',670.4414804702);
 Insert into public.coin_price(p_date, price) values('2021-05-05',670.4414804702);
@@ -225,3 +225,35 @@ Insert into public.coin_price(p_date, price) values('2021-12-11',104.3044925966)
 Insert into public.coin_price(p_date, price) values('2021-12-12',101.9845031323);
 Insert into public.coin_price(p_date, price) values('2021-12-13',100.7744481028);
 Insert into public.coin_price(p_date, price) values('2021-12-14',92.6365297842);
+
+CREATE OR REPLACE PROCEDURE public.save_coin_price(
+	IN pDate date,
+	IN price numeric(21, 10)
+    )
+LANGUAGE 'plpgsql'
+AS $BODY$
+
+begin
+
+CREATE TEMP TABLE bothDatesP (
+   dDate date
+) ON COMMIT DROP;
+
+insert into bothDatesP(dDate) values(pDate);
+insert into bothDatesP(dDate) values(pDate + 1);
+
+INSERT INTO public.coin_price (
+    p_date,
+    price
+    )
+Select 
+    dDate,
+    price
+From
+	bothDatesP
+ON CONFLICT (p_date) 
+DO UPDATE SET 
+    price = EXCLUDED.price;
+
+end;
+$BODY$;
