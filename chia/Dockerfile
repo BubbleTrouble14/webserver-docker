@@ -29,6 +29,7 @@ COPY ./modified/custom_coin_store.py /chia-blockchain/chia/full_node/custom_coin
 COPY ./modified/full_node.py /chia-blockchain/chia/full_node/full_node.py
 COPY ./modified/custom_db_wrapper.py /chia-blockchain/chia/util/custom_db_wrapper.py
 COPY ./modified/full_block.py /chia-blockchain/chia/types/full_block.py
+COPY ./modified/custom_end_of_slot_bundle.py /chia-blockchain/chia/types/custom_end_of_slot_bundle.py
 
 RUN cd chia-blockchain && \
     git submodule update --init mozilla-ca && \
@@ -36,6 +37,13 @@ RUN cd chia-blockchain && \
 
 ENV PATH=/chia-blockchain/venv/bin:$PATH
 WORKDIR /chia-blockchain
+
+# COPY ./modified/custom_block_store.py /chia/full_node/custom_block_store.py
+# COPY ./modified/custom_coin_store.py /chia/full_node/custom_coin_store.py
+# COPY ./modified/full_node.py /chia/full_node/full_node.py
+# COPY ./modified/custom_db_wrapper.py /chia/util/custom_db_wrapper.py
+# COPY ./modified/full_block.py /chia/types/full_block.py
+# COPY ./modified/custom_end_of_slot_bundle.py /chia/types/custom_end_of_slot_bundle.py
 
 RUN pip install psycopg2-binary
 

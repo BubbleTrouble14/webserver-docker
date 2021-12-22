@@ -575,3 +575,45 @@ commit;
 end;
 $BODY$;
 
+
+
+CREATE TABLE IF NOT EXISTS public.full_blocks_finished_sub_slots
+(
+    header_hash character(64) COLLATE pg_catalog."default" NOT NULL,
+    challenge_chain_end_of_slot_vdf_challenge character(64) COLLATE pg_catalog."default",
+    challenge_chain_end_of_slot_vdf_number_of_iterations bigint,
+    challenge_chain_end_of_slot_vdf_output_data character(200) COLLATE pg_catalog."default",
+    challenge_chain_infused_challenge_chain_sub_slot_hash character(64) COLLATE pg_catalog."default",
+    challenge_chain_subepoch_summary_hash character(64) COLLATE pg_catalog."default",
+    challenge_chain_new_sub_slot_iters bigint,
+    challenge_chain_new_difficulty bigint,
+
+    infused_challenge_chain_end_of_slot_vdf_challange character(64) COLLATE pg_catalog."default",
+    infused_challenge_chain_end_of_slot_vdf_number_of_iterations bigint,
+    infused_challenge_chain_end_of_slot_vdf_output_data character(200) COLLATE pg_catalog."default",
+
+    reward_chain_end_of_slot_vdf_challenge character(64) COLLATE pg_catalog."default",
+    reward_chain_end_of_slot_vdf_number_of_iterations bigint,
+    reward_chain_end_of_slot_vdf_output_data character(200) COLLATE pg_catalog."default",
+    reward_chain_challenge_chain_sub_slot_hash character(64) COLLATE pg_catalog."default",
+    reward_chain_infused_challenge_chain_sub_slot_hash character(64) COLLATE pg_catalog."default",
+    reward_chain_deficit bigint,
+
+    proofs_challenge_chain_slot_proof_witness_type smallint,
+    proofs_challenge_chain_slot_proof_witness bytea,
+    proofs_challenge_chain_slot_proof_normalized_to_identity boolean,
+    proofs_infused_challenge_chain_slot_proof_witness_type smallint,
+    proofs_infused_challenge_chain_slot_proof_witness bytea,
+    proofs_infused_challenge_chain_slot_proof_norm_to_identity boolean,
+    proofs_infused_reward_chain_slot_proof_witness_type smallint,
+    proofs_infused_reward_chain_slot_proof_witness bytea,
+    proofs_infused_reward_chain_slot_proof_normalized_to_identity boolean,
+
+    CONSTRAINT full_blocks_finished_sub_slots_incorporated_pkey PRIMARY KEY (header_hash, challenge_chain_end_of_slot_vdf_challenge)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.full_blocks_finished_sub_slots
+    OWNER to postgres;
+

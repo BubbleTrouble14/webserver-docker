@@ -11,7 +11,7 @@ services:
       - "8000:8000"
     depends_on:
       - pgdb
-      # - chia
+      - chia
       - cron
   pgdb:
     build: ./pgdb
@@ -24,14 +24,14 @@ services:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - db-data:/var/lib/postgresql/data
-  # chia:
-  #   build: ./chia
-  #   container_name: chia
-  #   restart: always
-  #   ports:
-  #     - "8445:8444"
-  #   volumes:
-  #     - chia-data:/root/.chia/
+  chia:
+    build: ./chia
+    container_name: chia
+    restart: always
+    ports:
+      - "8445:8444"
+    volumes:
+      - chia-data:/root/.chia/
   cron:
     build: ./cron
     container_name: cron

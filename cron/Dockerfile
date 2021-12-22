@@ -38,5 +38,5 @@ RUN crontab crontab
 # CMD ["docker-start.sh"]
 
 # CMD crond
-CMD ["python", "hello.py"]
-# CMD ["crond", "-f"]
+# CMD ["python", "hello.py"]
+CMD ["crond", "-f"]

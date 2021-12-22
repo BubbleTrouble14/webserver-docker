@@ -81,6 +81,8 @@ class BlockStore:
         # self.pgdb.commit()
         # pgdb_testcursor.close()
 
+        # log.warning("Save Blocks")
+
         pgdb_cursor = self.pgdb.cursor()
         
         pgdb_cursor.execute("CALL public.save_full_block(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", 
@@ -159,6 +161,53 @@ class BlockStore:
         self.pgdb.commit()
         pgdb_cursor.close()
 
+        # Finished Sub Slots
+
+        sub_slots = []
+        for sub_slot in block.finished_sub_slots:
+            sub_slots.append(
+                (
+                    header_hash.hex(),
+                    sub_slot.challenge_chain.challenge_chain_end_of_slot_vdf.challenge.hex(),
+                    sub_slot.challenge_chain.challenge_chain_end_of_slot_vdf.number_of_iterations,
+                    sub_slot.challenge_chain.challenge_chain_end_of_slot_vdf.output.data.hex(),
+                    sub_slot.challenge_chain_infused_challenge_chain_sub_slot_hash(),
+                    sub_slot.challenge_chain_subepoch_summary_hash(),
+                    sub_slot.challenge_chain_new_sub_slot_iters(),
+                    sub_slot.challenge_chain_new_difficulty(),
+
+                    sub_slot.infused_challenge_chain_end_of_slot_vdf_challange(),
+                    sub_slot.infused_challenge_chain_end_of_slot_vdf_number_of_iterations(),
+                    sub_slot.infused_challenge_chain_end_of_slot_vdf_output_data(),
+
+                    sub_slot.reward_chain.end_of_slot_vdf.challenge.hex(),
+                    sub_slot.reward_chain.end_of_slot_vdf.number_of_iterations,
+                    sub_slot.reward_chain.end_of_slot_vdf.output.data.hex(),
+                    sub_slot.reward_chain.challenge_chain_sub_slot_hash.hex(),
+                    sub_slot.reward_chain_infused_challenge_chain_sub_slot_hash(),
+                    sub_slot.reward_chain.deficit,
+
+                    sub_slot.proofs.challenge_chain_slot_proof.witness_type,
+                    sub_slot.proofs.challenge_chain_slot_proof.witness,
+                    sub_slot.proofs.challenge_chain_slot_proof.normalized_to_identity,
+                    sub_slot.proofs_infused_challenge_chain_slot_proof_witness_type(),
+                    sub_slot.proofs_infused_challenge_chain_slot_proof_witness(),
+                    sub_slot.proofs_infused_challenge_chain_slot_proof_norm_to_identity(),
+                    sub_slot.proofs.reward_chain_slot_proof.witness_type,
+                    sub_slot.proofs.reward_chain_slot_proof.witness,
+                    sub_slot.proofs.reward_chain_slot_proof.normalized_to_identity,
+                )
+            )
+
+        pgdb_cursor_2 = self.pgdb.cursor()
+        pgdb_cursor_2.executemany(
+            "INSERT INTO full_blocks_finished_sub_slots (header_hash, challenge_chain_end_of_slot_vdf_challenge, challenge_chain_end_of_slot_vdf_number_of_iterations, challenge_chain_end_of_slot_vdf_output_data, challenge_chain_infused_challenge_chain_sub_slot_hash, challenge_chain_subepoch_summary_hash, challenge_chain_new_sub_slot_iters, challenge_chain_new_difficulty, infused_challenge_chain_end_of_slot_vdf_challange, infused_challenge_chain_end_of_slot_vdf_number_of_iterations, infused_challenge_chain_end_of_slot_vdf_output_data, reward_chain_end_of_slot_vdf_challenge, reward_chain_end_of_slot_vdf_number_of_iterations, reward_chain_end_of_slot_vdf_output_data, reward_chain_challenge_chain_sub_slot_hash, reward_chain_infused_challenge_chain_sub_slot_hash, reward_chain_deficit, proofs_challenge_chain_slot_proof_witness_type, proofs_challenge_chain_slot_proof_witness, proofs_challenge_chain_slot_proof_normalized_to_identity, proofs_infused_challenge_chain_slot_proof_witness_type, proofs_infused_challenge_chain_slot_proof_witness, proofs_infused_challenge_chain_slot_proof_norm_to_identity, proofs_infused_reward_chain_slot_proof_witness_type, proofs_infused_reward_chain_slot_proof_witness, proofs_infused_reward_chain_slot_proof_normalized_to_identity) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (header_hash, challenge_chain_end_of_slot_vdf_challenge) DO UPDATE SET challenge_chain_end_of_slot_vdf_number_of_iterations = EXCLUDED.challenge_chain_end_of_slot_vdf_number_of_iterations, challenge_chain_end_of_slot_vdf_output_data = EXCLUDED.challenge_chain_end_of_slot_vdf_output_data, challenge_chain_infused_challenge_chain_sub_slot_hash = EXCLUDED.challenge_chain_infused_challenge_chain_sub_slot_hash, challenge_chain_subepoch_summary_hash = EXCLUDED.challenge_chain_subepoch_summary_hash, challenge_chain_new_sub_slot_iters = EXCLUDED.challenge_chain_new_sub_slot_iters, challenge_chain_new_difficulty = EXCLUDED.challenge_chain_new_difficulty, infused_challenge_chain_end_of_slot_vdf_challange = EXCLUDED.infused_challenge_chain_end_of_slot_vdf_challange, infused_challenge_chain_end_of_slot_vdf_number_of_iterations = EXCLUDED.infused_challenge_chain_end_of_slot_vdf_number_of_iterations, infused_challenge_chain_end_of_slot_vdf_output_data = EXCLUDED.infused_challenge_chain_end_of_slot_vdf_output_data, reward_chain_end_of_slot_vdf_challenge = EXCLUDED.reward_chain_end_of_slot_vdf_challenge, reward_chain_end_of_slot_vdf_number_of_iterations = EXCLUDED.reward_chain_end_of_slot_vdf_number_of_iterations, reward_chain_end_of_slot_vdf_output_data = EXCLUDED.reward_chain_end_of_slot_vdf_output_data, reward_chain_challenge_chain_sub_slot_hash = EXCLUDED.reward_chain_challenge_chain_sub_slot_hash, reward_chain_infused_challenge_chain_sub_slot_hash = EXCLUDED.reward_chain_infused_challenge_chain_sub_slot_hash, reward_chain_deficit = EXCLUDED.reward_chain_deficit, proofs_challenge_chain_slot_proof_witness_type = EXCLUDED.proofs_challenge_chain_slot_proof_witness_type, proofs_challenge_chain_slot_proof_witness = EXCLUDED.proofs_challenge_chain_slot_proof_witness, proofs_challenge_chain_slot_proof_normalized_to_identity = EXCLUDED.proofs_challenge_chain_slot_proof_normalized_to_identity, proofs_infused_challenge_chain_slot_proof_witness_type = EXCLUDED.proofs_infused_challenge_chain_slot_proof_witness_type, proofs_infused_challenge_chain_slot_proof_witness = EXCLUDED.proofs_infused_challenge_chain_slot_proof_witness, proofs_infused_challenge_chain_slot_proof_norm_to_identity = EXCLUDED.proofs_infused_challenge_chain_slot_proof_norm_to_identity, proofs_infused_reward_chain_slot_proof_witness_type = EXCLUDED.proofs_infused_reward_chain_slot_proof_witness_type, proofs_infused_reward_chain_slot_proof_witness = EXCLUDED.proofs_infused_reward_chain_slot_proof_witness, proofs_infused_reward_chain_slot_proof_normalized_to_identity = EXCLUDED.proofs_infused_reward_chain_slot_proof_normalized_to_identity;", 
+            sub_slots,
+        )
+        self.pgdb.commit()
+        pgdb_cursor_2.close()
+
+        # log.warning("Save Block Transactions")
 
         if(block.is_transaction_block()):
             values = []
