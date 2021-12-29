@@ -432,8 +432,8 @@ class CoinStore:
                     record.coin.name().hex(),
                     record.confirmed_block_index,
                     record.spent_block_index,
-                    int(record.spent),
-                    int(record.coinbase),
+                    record.spent,
+                    record.coinbase,
                     record.coin.puzzle_hash.hex(),
                     encode_puzzle_hash(record.coin.puzzle_hash, "xch"),
                     record.coin.parent_coin_info.hex(),
@@ -468,6 +468,13 @@ class CoinStore:
                     r.name, CoinRecord(r.coin, r.confirmed_block_index, index, True, r.coinbase, r.timestamp)
                 )
             updates.append((index, coin_name.hex()))
+
+        pgdb_cursor_spent = self.pgdb.cursor()
+        pgdb_cursor_spent.executemany(
+            "UPDATE coin_record SET spent=true, spent_index=%s WHERE coin_name=%s", updates
+        )
+        self.pgdb.commit()
+        pgdb_cursor_spent.close()
 
         await self.coin_record_db.executemany(
             "UPDATE OR FAIL coin_record SET spent=1,spent_index=? WHERE coin_name=?", updates
